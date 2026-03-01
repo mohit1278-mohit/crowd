@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Crowd Management System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <video id="bg-video" autoplay muted loop playsinline>
+        <source src="output.mp4" type="video/mp4">
+    </video>
+
+    <div class="overlay">
+        <div class="content">
+            <h1>Crowd</h1>
+            <h1>Management</h1>
+            <h1>System</h1>
+
+            <div class="button-container">
+                <button class="btn" onclick="openLiveCam()">Live Cam</button>
+                <button class="btn">Share Screen</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function openLiveCam() {
+            window.location.href = "live.html";
+        }
+    </script>
+</body>
+
+</html>

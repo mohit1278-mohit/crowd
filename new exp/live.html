@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Crowd Monitoring Dashboard</title>
+    <link rel="stylesheet" href="live.css">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <button onclick="goHome()">Home</button>
+        <button>About</button>
+    </div>
+
+    <div class="container">
+
+        <!-- CAMERA SECTION -->
+        <div class="camera-section">
+
+            <div class="top-bar">
+                <div class="cam-tag">CAM 1</div>
+
+                <div class="people-box">
+                    People <span id="peopleCount">0</span>
+                    <span class="status-dot" id="smallDot"></span>
+                </div>
+            </div>
+
+            <!-- CAMERA VIEW -->
+            <div class="camera-view">
+                <img src="http://127.0.0.1:5000/video" id="videoFeed">
+            </div>
+
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="right-panel">
+
+            <!-- ADD PHONE -->
+            <div class="card">
+                <h2>ADD PHONE</h2>
+
+                <div id="phoneContainer">
+                    <div class="phone-row">
+                        <input type="text" placeholder="Enter phone number">
+                        <span class="delete-btn" onclick="deletePhone(this)">🗑</span>
+                    </div>
+                </div>
+
+                <button class="plus-btn" onclick="addPhone()">+</button>
+            </div>
+
+            <!-- SET LIMIT -->
+            <div class="card center">
+
+                <h3 class="limit-title">SET PEOPLE LIMIT</h3>
+
+                <h1 id="limitDisplay">100</h1>
+
+                <input type="number" id="limitInput" placeholder="Enter Limit">
+
+                <button class="set-btn" onclick="setLimit()">Set</button>
+
+            </div>
+
+            <!-- CROWD STATUS -->
+            <div class="card status-card" id="statusCard">
+                <div class="big-dot" id="bigDot"></div>
+                <h2 id="statusText">CROWD SAFE</h2>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="live.js"></script>
+
+</body>
+
+</html>

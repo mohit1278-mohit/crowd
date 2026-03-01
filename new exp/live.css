@@ -1,0 +1,184 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #2f6f73;
+    color: white;
+}
+
+/* NAVBAR */
+.navbar {
+    background: #083c3e;
+    padding: 15px;
+    text-align: right;
+}
+
+.navbar button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* MAIN CONTAINER */
+.container {
+    display: flex;
+    padding: 30px;
+    gap: 30px;
+}
+
+/* CAMERA SECTION */
+.camera-section {
+    flex: 2;
+    background: linear-gradient(to right, #2b2b2b, #3a3a3a);
+    border-radius: 25px;
+    padding: 20px;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* TOP BAR */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+}
+
+.cam-tag {
+    background: #2f6f73;
+    padding: 10px 25px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+/* PEOPLE BOX */
+.people-box {
+    background: #2f6f73;
+    padding: 10px 20px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+}
+
+/* STATUS DOT */
+.status-dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: lime;
+}
+
+/* CAMERA VIEW */
+.camera-view {
+    flex: 1;
+    width: 100%;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.camera-view img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 15px;
+}
+
+/* RIGHT PANEL */
+.right-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* CARDS */
+.card {
+    background: linear-gradient(to right, #2b2b2b, #3a3a3a);
+    padding: 25px;
+    border-radius: 25px;
+}
+
+/* INPUT */
+.card input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 15px;
+    margin-top: 15px;
+}
+
+/* ADD BUTTON */
+.plus-btn {
+    margin-top: 15px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+/* SET BUTTON */
+.set-btn {
+    margin-top: 15px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    background: #2f6f73;
+    color: white;
+    font-weight: bold;
+}
+
+/* LIMIT TITLE */
+.limit-title {
+    margin-bottom: 10px;
+}
+
+.center {
+    text-align: center;
+}
+
+/* STATUS CARD */
+.status-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* BIG DOT */
+.big-dot {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: lime;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+    .container {
+        flex-direction: column;
+    }
+}
+.phone-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.delete-btn {
+    cursor: pointer;
+    font-size: 20px;
+    background: #ff4d4d;
+    padding: 6px 10px;
+    border-radius: 8px;
+}
+
+.delete-btn:hover {
+    background: red;
+}
