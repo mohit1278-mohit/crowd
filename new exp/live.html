@@ -1,79 +1,144 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <title>Crowd Monitoring Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>👁</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="live.css">
 </head>
 
 <body>
 
-    <!-- NAVBAR -->
-    <div class="navbar">
-        <button onclick="goHome()">Home</button>
-        <button>About</button>
+    <!-- ERROR BANNER -->
+    <div class="error-banner" id="errorBanner" role="alert" aria-live="assertive" hidden>
+        <span class="error-icon">⚠️</span>
+        <span id="errorMsg">Unable to connect to the server. Make sure the backend is running.</span>
+        <button class="banner-close" onclick="dismissBanner()" aria-label="Dismiss error">✕</button>
     </div>
 
-    <div class="container">
+    <!-- NAVBAR -->
+    <nav class="navbar" aria-label="Main navigation">
+        <div class="nav-logo">
+            <span class="logo-icon">👁</span>
+            <span class="logo-text">CrowdAI</span>
+        </div>
+        <div class="nav-links">
+            <button class="nav-btn" onclick="goHome()" aria-label="Go to home page">Home</button>
+            <button class="nav-btn" aria-label="About">About</button>
+            <div class="server-status" id="serverStatus" aria-label="Server status">
+                <span class="status-dot-nav" id="statusDotNav"></span>
+                <span id="statusLabel">Connecting…</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
 
         <!-- CAMERA SECTION -->
-        <div class="camera-section">
+        <section class="camera-section" aria-label="Live camera feed">
 
             <div class="top-bar">
-                <div class="cam-tag">CAM 1</div>
+                <div class="cam-tag">
+                    <span class="live-dot"></span> LIVE &nbsp;|&nbsp; CAM 1
+                </div>
 
-                <div class="people-box">
-                    People <span id="peopleCount">0</span>
-                    <span class="status-dot" id="smallDot"></span>
+                <div class="people-box" aria-label="People count">
+                    <span class="people-label">PEOPLE</span>
+                    <span id="peopleCount" class="people-number">0</span>
+                    <span class="status-dot" id="smallDot" aria-hidden="true"></span>
                 </div>
             </div>
 
-            <!-- CAMERA VIEW -->
-            <div class="camera-view">
-                <img src="http://127.0.0.1:5000/video" id="videoFeed">
+            <!-- LOADING SPINNER -->
+            <div class="feed-wrapper">
+                <div class="loading-spinner" id="loadingSpinner" aria-label="Loading video feed">
+                    <div class="spinner"></div>
+                    <p>Connecting to feed…</p>
+                </div>
+                <div class="scanline-overlay" aria-hidden="true"></div>
+                <img src="http://127.0.0.1:5000/video" id="videoFeed" alt="Live camera feed"
+                     onload="hideFeedSpinner()" onerror="onFeedError()">
             </div>
 
-        </div>
+        </section>
 
         <!-- RIGHT PANEL -->
-        <div class="right-panel">
+        <aside class="right-panel" aria-label="Controls and status">
 
-            <!-- ADD PHONE -->
-            <div class="card">
-                <h2>ADD PHONE</h2>
+            <!-- ADD PHONE CARD -->
+            <div class="card" aria-label="Phone alert list">
+                <h2 class="card-title">
+                    <span class="card-icon">📱</span> ADD PHONE
+                </h2>
 
-                <div id="phoneContainer">
-                    <div class="phone-row">
-                        <input type="text" placeholder="Enter phone number">
-                        <span class="delete-btn" onclick="deletePhone(this)">🗑</span>
-                    </div>
+                <div id="phoneContainer" class="phone-chips">
+                    <!-- phone chips added by JS -->
                 </div>
 
-                <button class="plus-btn" onclick="addPhone()">+</button>
+                <div class="phone-input-row">
+                    <input type="tel" id="newPhoneInput" placeholder="e.g. +1 555 000 1234"
+                           aria-label="Phone number to add">
+                    <button class="icon-btn add-btn" onclick="addPhone()" aria-label="Add phone number">＋</button>
+                </div>
             </div>
 
-            <!-- SET LIMIT -->
-            <div class="card center">
+            <!-- SET LIMIT CARD -->
+            <div class="card center" aria-label="Set crowd limit">
+                <h3 class="card-title">
+                    <span class="card-icon">🎯</span> SET PEOPLE LIMIT
+                </h3>
 
-                <h3 class="limit-title">SET PEOPLE LIMIT</h3>
+                <div class="limit-display-wrap">
+                    <button class="stepper-btn" onclick="adjustLimit(-1)" aria-label="Decrease limit">−</button>
+                    <span id="limitDisplay" class="limit-number">100</span>
+                    <button class="stepper-btn" onclick="adjustLimit(1)" aria-label="Increase limit">＋</button>
+                </div>
 
-                <h1 id="limitDisplay">100</h1>
-
-                <input type="number" id="limitInput" placeholder="Enter Limit">
-
-                <button class="set-btn" onclick="setLimit()">Set</button>
+                <div class="limit-input-row">
+                    <input type="number" id="limitInput" placeholder="Enter limit" min="1"
+                           aria-label="Custom limit value">
+                    <button class="set-btn" onclick="setLimit()" aria-label="Apply limit">Set</button>
+                </div>
 
             </div>
 
-            <!-- CROWD STATUS -->
-            <div class="card status-card" id="statusCard">
-                <div class="big-dot" id="bigDot"></div>
-                <h2 id="statusText">CROWD SAFE</h2>
+            <!-- CROWD STATUS CARD -->
+            <div class="card status-card" id="statusCard" aria-label="Crowd status">
+                <div class="pulse-ring" id="pulseRing" aria-hidden="true"></div>
+                <div class="big-dot" id="bigDot" aria-hidden="true"></div>
+                <div class="status-info">
+                    <h2 id="statusText" class="status-text">CROWD SAFE</h2>
+                    <div class="progress-bar-wrap" aria-label="Crowd progress">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <span id="progressLabel" class="progress-label">0 / 100</span>
+                </div>
             </div>
 
+        </aside>
+
+    </main>
+
+    <!-- STATS BAR -->
+    <footer class="stats-bar" aria-label="Stats summary">
+        <div class="stat-item">
+            <span class="stat-label">Peak Count Today</span>
+            <span class="stat-value" id="peakCount">0</span>
         </div>
-    </div>
+        <div class="stat-item">
+            <span class="stat-label">Alerts Sent</span>
+            <span class="stat-value" id="alertsSentCount">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Uptime</span>
+            <span class="stat-value" id="uptimeDisplay">00:00:00</span>
+        </div>
+    </footer>
 
     <script src="live.js"></script>
 

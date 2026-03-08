@@ -1,16 +1,23 @@
-from flask import Flask, jsonify, Response
+from flask import Flask, jsonify, Response, request
 from flask_cors import CORS
 import cv2
 from ultralytics import YOLO
 import threading
+import time
 import torch
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-CORS(app)
+# CORS restricted to localhost origins; adjust origins in production
+CORS(app, origins=["http://127.0.0.1:5500", "http://localhost:5500",
+                   "http://127.0.0.1:5000", "null"])
 
 # Detect GPU
 device = "cuda" if torch.cuda.is_available() else "cpu"
-print("Running on:", device)
+logger.info("Running on: %s", device)
 
 # Load YOLO model
 model = YOLO("yolov8m.pt").to(device)
@@ -18,15 +25,21 @@ model = YOLO("yolov8m.pt").to(device)
 # Open camera
 cap = cv2.VideoCapture(0)
 
-# Camera resolution (important)
+# Camera resolution
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
-people_count = 0
 stable_count = 0
 output_frame = None
+frame_lock = threading.Lock()
 
 CONFIDENCE_THRESHOLD = 0.4
+
+
+# Health check endpoint
+@app.route("/health")
+def health():
+    return jsonify({"status": "ok"})
 
 
 # API to send people count to frontend
@@ -35,9 +48,26 @@ def get_count():
     return jsonify({"people": stable_count})
 
 
+# Alert endpoint — logs numbers and message; wire up Twilio here if needed
+@app.route("/alert", methods=["POST"])
+def send_alert():
+    data = request.get_json(silent=True) or {}
+    phones = data.get("phones", [])
+    message = data.get("message", "Crowd limit exceeded!")
+
+    if not isinstance(phones, list):
+        return jsonify({"error": "phones must be a list"}), 400
+
+    for phone in phones:
+        # Replace with Twilio or SMS integration as needed
+        logger.info("ALERT to %s: %s", phone, message)
+
+    return jsonify({"sent": len(phones), "message": message})
+
+
 # Detection Thread
 def detect_people():
-    global people_count, output_frame, stable_count
+    global output_frame, stable_count
 
     last_counts = []
 
@@ -45,6 +75,7 @@ def detect_people():
         ret, frame = cap.read()
 
         if not ret:
+            time.sleep(0.01)
             continue
 
         overlay = frame.copy()
@@ -59,10 +90,6 @@ def detect_people():
 
                 # Only detect PERSON
                 if cls != 0:
-                    continue
-
-                conf = float(box.conf[0])
-                if conf < CONFIDENCE_THRESHOLD:
                     continue
 
                 count += 1
@@ -118,18 +145,25 @@ def detect_people():
                     (0, 255, 255),
                     3)
 
-        output_frame = frame
+        with frame_lock:
+            output_frame = frame
 
 
 # Video stream generator
 def generate_frames():
-    global output_frame
-
     while True:
-        if output_frame is None:
+        with frame_lock:
+            current_frame = output_frame
+
+        if current_frame is None:
+            time.sleep(0.01)
             continue
 
-        ret, buffer = cv2.imencode('.jpg', output_frame)
+        ret, buffer = cv2.imencode('.jpg', current_frame)
+        if not ret:
+            time.sleep(0.01)
+            continue
+
         frame = buffer.tobytes()
 
         yield (b'--frame\r\n'
@@ -143,10 +177,18 @@ def video_feed():
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
+def cleanup():
+    cap.release()
+    cv2.destroyAllWindows()
+
+
 # Start detection thread
 threading.Thread(target=detect_people, daemon=True).start()
 
 
 # Run server
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, threaded=True)
+    try:
+        app.run(host="0.0.0.0", port=5000, threaded=True)
+    finally:
+        cleanup()
