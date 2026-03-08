@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <title>Crowd Management System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>👁</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -16,19 +20,49 @@
 
     <div class="overlay">
         <div class="content">
-            <h1>Crowd</h1>
-            <h1>Management</h1>
-            <h1>System</h1>
+            <div class="title-group">
+                <h1 class="word-animate" style="--delay:0s">Crowd</h1>
+                <h1 class="word-animate" style="--delay:0.2s">Management</h1>
+                <h1 class="word-animate" style="--delay:0.4s">System</h1>
+            </div>
+            <p class="tagline word-animate" style="--delay:0.6s">AI-Powered Real-Time Crowd Analytics</p>
 
             <div class="button-container">
-                <button class="btn" onclick="openLiveCam()">Live Cam</button>
-                <button class="btn">Share Screen</button>
+                <button class="btn btn-primary" onclick="openLiveCam()" aria-label="Open Live Camera Dashboard">
+                    <span class="btn-icon">📹</span> Live Cam
+                </button>
+                <button class="btn btn-secondary coming-soon-btn" id="shareBtn" aria-label="Share Screen — Coming Soon">
+                    <span class="btn-icon">🖥️</span> Share Screen
+                    <span class="coming-soon-badge">Coming Soon</span>
+                </button>
             </div>
         </div>
     </div>
+
     <script>
         function openLiveCam() {
             window.location.href = "live.html";
+        }
+
+        // Share Screen — getDisplayMedia implementation (where supported)
+        const shareBtn = document.getElementById('shareBtn');
+        if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+            shareBtn.classList.remove('coming-soon-btn');
+            shareBtn.querySelector('.coming-soon-badge').remove();
+            shareBtn.setAttribute('aria-label', 'Share Screen');
+            shareBtn.onclick = async function () {
+                try {
+                    const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+                    // Stream obtained — placeholder: currently preview only
+                    const tracks = stream.getTracks();
+                    tracks.forEach(t => t.stop());
+                    alert('Screen sharing captured. Integration with backend coming soon.');
+                } catch (err) {
+                    if (err.name !== 'NotAllowedError') {
+                        console.error('Screen share error:', err);
+                    }
+                }
+            };
         }
     </script>
 </body>
